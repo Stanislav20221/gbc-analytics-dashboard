@@ -9,23 +9,38 @@
   <h1>Orders Dashboard</h1>
   <canvas id="chart"></canvas>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-    const supabase = createClient(
-      'https://ppawsqstspjihzgxbwhx.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwYXdzcXN0c3BqaWh6Z3hid2h4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzI4NjQsImV4cCI6MjA5MTcwODg2NH0.34ZaPLEtPbsbOFJUE1C27b6AhGStK3HqpgktS7HxIZk'
-    )
+  const supabase = createClient(
+    'https://pwpawsgtspjhjzgxbwhx.supabase.co',
+    'ТВОЙ_PUBLISHABLE_KEY'
+  )
 
-    const { data } = await supabase
+  async function loadData() {
+    const { data, error } = await supabase
       .from('orders')
       .select('*')
-      .order('created_at', { ascending: true })
+
+    if (error) {
+      console.error(error)
+      document.body.innerHTML += `<p style="color:red;">Ошибка: ${error.message}</p>`
+      return
+    }
+
+    console.log('DATA:', data)
+
+    if (!data || data.length === 0) {
+      document.body.innerHTML += `<p>Нет данных</p>`
+      return
+    }
 
     const labels = data.map(o => o.number)
-    const values = data.map(o => o.total_sum)
+    const values = data.map(o => Number(o.total_sum || 0))
 
-    new Chart(document.getElementById('chart'), {
+    const ctx = document.getElementById('chart')
+
+    new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
@@ -35,6 +50,9 @@
         }]
       }
     })
-  </script>
+  }
+
+  loadData()
+</script>
 </body>
 </html>
