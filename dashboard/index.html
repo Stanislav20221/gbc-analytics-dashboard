@@ -8,51 +8,51 @@
 <body>
   <h1>Orders Dashboard</h1>
   <canvas id="chart"></canvas>
+  <pre id="debug"></pre>
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-  const supabase = createClient(
-    'https://ppawsqstspjihzgxbwhx.supabase.co',
-    'sb_publishable_NsMfoEPj40XgmNMSlpnb9Q_WHC4Cia4'
-  )
+    const supabaseUrl = 'https://ppawsqstspjihzgxbwhx.supabase.co'
+    const supabaseKey = 'sb_publishable_NsMfoEPj40XgmNMSlpnb9Q_WHC4Cia4'
 
-  async function loadData() {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
+    const debug = document.getElementById('debug')
+    debug.textContent =
+      'URL: ' + supabaseUrl + '\n' +
+      'KEY PREFIX: ' + supabaseKey.slice(0, 30)
 
-    if (error) {
-      console.error(error)
-      document.body.innerHTML += `<p style="color:red;">Ошибка: ${error.message}</p>`
-      return
-    }
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
-    console.log('DATA:', data)
+    async function loadData() {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: true })
 
-    if (!data || data.length === 0) {
-      document.body.innerHTML += `<p>Нет данных</p>`
-      return
-    }
-
-    const labels = data.map(o => o.number)
-    const values = data.map(o => Number(o.total_sum || 0))
-
-    const ctx = document.getElementById('chart')
-
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Order Sum',
-          data: values
-        }]
+      if (error) {
+        console.error(error)
+        debug.textContent += '\nERROR: ' + error.message
+        return
       }
-    })
-  }
 
-  loadData()
-</script>
+      debug.textContent += '\nROWS: ' + data.length
+
+      const labels = data.map(o => o.number)
+      const values = data.map(o => Number(o.total_sum || 0))
+
+      new Chart(document.getElementById('chart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Order Sum',
+            data: values
+          }]
+        }
+      })
+    }
+
+    loadData()
+  </script>
 </body>
 </html>
