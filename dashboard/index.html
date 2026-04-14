@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Orders Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Orders Dashboard</h1>
+  <canvas id="chart"></canvas>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabase = createClient(
+      'ТВОЙ_SUPABASE_URL',
+      'ТВОЙ_SUPABASE_KEY'
+    )
+
+    const { data } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: true })
+
+    const labels = data.map(o => o.number)
+    const values = data.map(o => o.total_sum)
+
+    new Chart(document.getElementById('chart'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Order Sum',
+          data: values
+        }]
+      }
+    })
+  </script>
+</body>
+</html>
