@@ -40,16 +40,33 @@
       const labels = data.map(o => o.number)
       const values = data.map(o => Number(o.total_sum || 0))
 
-      new Chart(document.getElementById('chart'), {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Order Sum',
-            data: values
-          }]
+    new Chart(document.getElementById('chart'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [{
+        label: 'Сумма заказа',
+        data: values
+        }]
+    },
+    options: {
+        scales: {
+        x: {
+            title: {
+            display: true,
+            text: 'Заказы'   // ← ось X (абсцисс)
+            }
+        },
+        y: {
+            title: {
+            display: true,
+            text: 'Сумма'   // ← ось Y (ординат)
+            },
+            beginAtZero: true
         }
-      })
+        }
+    }
+    })
     }
 
     loadData()
