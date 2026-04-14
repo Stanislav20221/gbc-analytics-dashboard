@@ -53,6 +53,13 @@
     }
 
     loadData()
+    const byDay = {}
+
+    data.forEach(o => {
+    const date = o.created_at.split('T')[0]
+    byDay[date] = (byDay[date] || 0) + o.total_sum
+    })
+    setInterval(loadData, 5000)
   </script>
 </body>
 </html>
